@@ -5,12 +5,20 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sqlserver
     environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=Strong_Passw0rd!
-    ports:
-      - "1433:1433"
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Strong_Passw0rd!"
     volumes:
       - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: >
+        /opt/mssql-tools/bin/sqlcmd
+        -S localhost
+        -U sa
+        -P Strong_Passw0rd!
+        -Q "SELECT 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   productapi:
     build: .
@@ -18,9 +26,16 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      - sqlserver
+      sqlserver:
+        condition: service_healthy
     environment:
-      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=ProductDb;User Id=sa;Password=Strong_Passw0rd!
+      ASPNETCORE_URLS: "http://+:5000"
+      ConnectionStrings__DefaultConnection: >
+        Server=sqlserver,1433;
+        Database=ProductDb;
+        User Id=sa;
+        Password=Strong_Passw0rd!;
+        TrustServerCertificate=True
 
 volumes:
   sqlserver-data:
