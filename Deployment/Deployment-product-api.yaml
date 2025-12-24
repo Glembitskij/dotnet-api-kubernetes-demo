@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: productapi
+  namespace: product-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: productapi
+  template:
+    metadata:
+      labels:
+        app: productapi
+    spec:
+      containers:
+        - name: productapi
+          image: productapi:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5000
+          env:
+            - name: ASPNETCORE_URLS
+              value: http://+:5000
+            - name: ConnectionStrings__DefaultConnection
+              value: "Server=sqlserver,1433;Database=ProductDb;User Id=sa;Password=Strong_Passw0rd!;TrustServerCertificate=True"
