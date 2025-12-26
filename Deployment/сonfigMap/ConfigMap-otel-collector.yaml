@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector-config
+  namespace: product-api
+data:
+  otel-collector-config.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+
+    processors:
+      batch:
+
+    exporters:
+      elasticsearch:
+        endpoints: ["http://elasticsearch:9200"]
+        traces_index: "traces"
+        logs_index: "logs"
+        metrics_index: "metrics"
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [elasticsearch]
+        logs:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [elasticsearch]
+        metrics:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [elasticsearch]

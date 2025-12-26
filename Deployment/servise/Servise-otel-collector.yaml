@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-collector
+  namespace: product-api
+spec:
+  selector:
+    app: otel-collector
+  #type: LoadBalancer
+  ports:
+    - name: grpc
+      port: 4317
+    - name: http
+      port: 4318
